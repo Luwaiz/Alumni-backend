@@ -7,7 +7,7 @@ const {
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddlewares");
 const router = express.Router();
-const upload = require("../middleware/upload");
+const upload = require("../middleware/multer");
 
 router.post("/signup", upload.single("profilePicture"), signUp);
 router.post("/logIn", logIn);

@@ -3,10 +3,19 @@ const multer = require("multer");
 const router = express.Router();
 const Posts = require("../models/Memories");
 const authMiddleware = require("../middleware/authMiddlewares");
+const fs = require("fs"); // Import the fs module
+const path = require("path"); // Import the path module
+// Configure multer for image uploads
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+	fs.mkdirSync(uploadsDir, { recursive: true }); // Create the directory if it doesn't exist
+}
+
 // Configure multer for image uploads
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, "uploads/"); // Save images in the 'uploads' folder
+		cb(null, uploadsDir); // Save images in the 'uploads' folder
 	},
 	filename: (req, file, cb) => {
 		cb(null, Date.now() + "-" + file.originalname); // Unique filename
@@ -16,32 +25,37 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Create a new post
-router.post("/create", upload.single("image"), async (req, res) => {
-	try {
-		console.log("Request Body:", req.body); // Log the request body
-		console.log("Uploaded File:", req.file); // Log the uploaded file
+router.post(
+	"/create",
+	authMiddleware,
+	upload.single("image"),
+	async (req, res) => {
+		try {
+			console.log("Request Body:", req.body); // Log the request body
+			console.log("Uploaded File:", req.file); // Log the uploaded file
 
-		const { ownerName, ownerId } = req.user; // Get user info from the token
-		const imageUrl = req.file.path; // Path to the uploaded image
+			const { ownerName, ownerId } = req.user; // Get user info from the token
+			const imageUrl = req.file.path; // Path to the uploaded image
 
-		// Validate required fields
-		if (!ownerName || !ownerId || !imageUrl) {
-			return res.status(400).json({ message: "All fields are required" });
+			// Validate required fields
+			if (!ownerName || !ownerId || !imageUrl) {
+				return res.status(400).json({ message: "All fields are required" });
+			}
+
+			const newPost = new Post({
+				imageUrl,
+				ownerName,
+				ownerId,
+			});
+
+			await newPost.save();
+			res.status(201).json(newPost);
+		} catch (error) {
+			console.error("Error creating post:", error);
+			res.status(500).json({ message: "Server error" });
 		}
-
-		const newPost = new Posts({
-			imageUrl,
-			ownerName,
-			ownerId,
-		});
-		console.log(newPost);
-		await newPost.save();
-		res.status(201).json(newPost);
-	} catch (error) {
-		console.error("Error creating post:", error);
-		res.status(500).json({ message: "Server error" });
 	}
-});
+);
 router.get("/feed", async (req, res) => {
 	try {
 		const posts = await Posts.find().sort({ createdAt: -1 }); // Sort by latest first

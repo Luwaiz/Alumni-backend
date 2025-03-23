@@ -16,6 +16,10 @@ const MongodbURL = process.env.MONGO_URL;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors({
+	origin: "http://localhost:3000", // Allow requests from this origin
+	credentials: true, // Allow cookies and credentials
+  }));
 app.use("/api/auth", UserRoute);
 app.use("/api/posts", Memory);
 

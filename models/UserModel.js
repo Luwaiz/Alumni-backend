@@ -62,6 +62,10 @@ const UserSchema = mongoose.Schema(
 			required: true,
 			trim: true,
 		},
+		profilePicture: {
+			type: "string", // Store the URL of the profile picture
+			default: "", // Default to an empty string if no picture is uploaded
+		  },
 	},
 	{ timestamps: true }
 );

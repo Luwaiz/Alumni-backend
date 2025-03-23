@@ -7,8 +7,9 @@ const {
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddlewares");
 const router = express.Router();
+const upload = require("../middleware/upload");
 
-router.post("/signup", signUp);
+router.post("/signup", upload.single("profilePicture"), signUp);
 router.post("/logIn", logIn);
 router.get("/getProfile/:matricNo", authMiddleware, getUserProfile);
 router.get("/getAllUsers", authMiddleware, getAllUsers);

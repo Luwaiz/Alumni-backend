@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/signup", signUp);
 router.post("/logIn", logIn);
-router.get("/getProfile/:matricNo",authMiddleware, getUserProfile);
-router.get("/getAllUsers",authMiddleware, getAllUsers);
+router.get("/getProfile/:matricNo", authMiddleware, getUserProfile);
+router.get("/getAllUsers", authMiddleware, getAllUsers);
 
 module.exports = router;

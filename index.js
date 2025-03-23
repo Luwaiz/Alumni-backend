@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const UserRoute = require("./routes/UserRoute");
+const Memory = require("./controllers/MemoriesControl");
 // const ExpenseRoute = require("./routes/ExpenseRoute");
 // const BudgetRoute = require("./routes/BudgetRoute");
 // const errorHandler = require("./middlewares/errorHandler");
@@ -16,6 +17,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/api/auth", UserRoute);
+app.use("/api/auth/memory", Memory);
+
 // app.use("/api/expense", ExpenseRoute);
 // app.use("/api/budget", BudgetRoute);
 // app.use(errorHandler);

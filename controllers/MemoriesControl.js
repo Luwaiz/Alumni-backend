@@ -26,37 +26,37 @@ const upload = multer({ storage });
 
 // Create a new post
 router.post(
-  "/create",
-  authMiddleware,
-  upload.single("image"),
-  async (req, res) => {
-    try {
-      console.log("Request Body:", req.body); // Log the request body
-      console.log("Uploaded File:", req.file); // Log the uploaded file
-
-      const { ownerName, ownerId } = req.user; // Get user info from the token
-      const imageUrl = req.file.path; // Path to the uploaded image
-
-      // Validate required fields
-      if (!ownerName || !ownerId || !imageUrl) {
-        return res.status(400).json({ message: "All fields are required" });
+    "/create",
+    authMiddleware,
+    upload.single("image"),
+    async (req, res) => {
+      try {
+        console.log("Request Body:", req.body); // Log the request body
+        console.log("Uploaded File:", req.file); // Log the uploaded file
+        console.log("User Info:", req.user); // Log the user info from the token
+  
+        const { name: ownerName, id: ownerId } = req.user; // Get user info from the token
+        const imageUrl = req.file.path; // Path to the uploaded image
+  
+        // Validate required fields
+        if (!ownerName || !ownerId || !imageUrl) {
+          return res.status(400).json({ message: "All fields are required" });
+        }
+  
+        const newPost = new Post({
+          imageUrl,
+          ownerName,
+          ownerId,
+        });
+  
+        await newPost.save();
+        res.status(201).json(newPost);
+      } catch (error) {
+        console.error("Error creating post:", error);
+        res.status(500).json({ message: "Server error" });
       }
-
-      const newPost = new Post({
-        imageUrl,
-        ownerName,
-        ownerId,
-      });
-
-      await newPost.save();
-      res.status(201).json(newPost);
-    } catch (error) {
-      console.error("Error creating post:", error);
-      res.status(500).json({ message: "Server error" });
     }
-  }
-);
-
+  );
 // Fetch all posts
 router.get("/feed", async (req, res) => {
   try {

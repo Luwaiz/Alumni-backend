@@ -16,29 +16,32 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Create a new post
-router.post(
-	"/create",
-	authMiddleware,
-	upload.single("image"),
-	async (req, res) => {
-		try {
-			const { id: ownerId, name: ownerName } = req.user; // Get user info from the token
-			const imageUrl = req.file.path; // Path to the uploaded image
+router.post("/create", upload.single("image"), async (req, res) => {
+	try {
+		console.log("Request Body:", req.body); // Log the request body
+		console.log("Uploaded File:", req.file); // Log the uploaded file
 
-			const newPost = new Posts({
-				imageUrl,
-				ownerName,
-				ownerId,
-			});
+		const { ownerName, ownerId } = req.user; // Get user info from the token
+		const imageUrl = req.file.path; // Path to the uploaded image
 
-			await newPost.save();
-			res.status(201).json(newPost);
-		} catch (error) {
-			console.error("Error creating post:", error);
-			res.status(500).json({ message: "Server error" });
+		// Validate required fields
+		if (!ownerName || !ownerId || !imageUrl) {
+			return res.status(400).json({ message: "All fields are required" });
 		}
+
+		const newPost = new Posts({
+			imageUrl,
+			ownerName,
+			ownerId,
+		});
+		console.log(newPost);
+		await newPost.save();
+		res.status(201).json(newPost);
+	} catch (error) {
+		console.error("Error creating post:", error);
+		res.status(500).json({ message: "Server error" });
 	}
-);
+});
 router.get("/feed", async (req, res) => {
 	try {
 		const posts = await Posts.find().sort({ createdAt: -1 }); // Sort by latest first

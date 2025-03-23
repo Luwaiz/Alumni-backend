@@ -23,9 +23,7 @@ app.use(cors({
 app.use("/api/auth", UserRoute);
 app.use("/api/posts", Memory);
 
-// app.use("/api/expense", ExpenseRoute);
-// app.use("/api/budget", BudgetRoute);
-// app.use(errorHandler);
+
 
 app.get("/", (req, res) => {
 	res.send("ALUMNI!");
